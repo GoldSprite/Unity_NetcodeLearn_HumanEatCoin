@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,12 @@ public class WinDialogManager : MonoBehaviour
     {
         winDialog.SetActive(true);
         ScoreTxt.text = "Score: " + GameManager.Instance.CoinPoint;
-        SpendTimes.text = "SpendTime: " + (int)Time.realtimeSinceStartup+"s";
+        TimeSpan time = TimeSpan.FromSeconds((int)Time.realtimeSinceStartup);
+
+        string formattedTime = $"{(time.Days > 0 ? time.Days + "d " : "")}" +
+                               $"{(time.Hours > 0 ? time.Hours + "h " : "")}" +
+                               $"{(time.Minutes > 0 ? time.Minutes + "m " : "")}" +
+                               $"{(time.Seconds > 0 ? time.Seconds + "s" : "")}";
+        SpendTimes.text = "SpendTime: "+ formattedTime;
     }
 }

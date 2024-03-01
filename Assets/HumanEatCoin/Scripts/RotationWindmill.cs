@@ -27,16 +27,17 @@ public class RotationWindmill : MonoBehaviour
         var materials = GetComponentsInChildren<MeshRenderer>()?.Select(p => p.materials)?.ToList();
         if (materials != null && materials.Count > 0)
         {
-            for (int i = 0; i < 10; i++)
+            var fadeRate = 30f;
+            for (int i = 0; i < fadeRate; i++)
             {
                 foreach (var ii in materials)
                     foreach (var material in ii)
                     {
                         var c = material.color;
-                        c.a -= 0.1f;
+                        c.a -= 1 / fadeRate;
                         material.color = c;
                     }
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(1 / fadeRate);
             }
         }
         Destroy(gameObject);
