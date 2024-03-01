@@ -26,9 +26,8 @@ public class GameManager : MonoBehaviour
     private int randomRange = 6;
     public List<Transform> Coins = new();
 
-    [SerializeField] 
-    private GameObject winDialog;
     private bool win;
+    public static Action WinEvent;
 
     public Text FPSTxt;
 
@@ -43,17 +42,13 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        Win();
-        FPSTxt.text = "FPS: "+(int)(1 / Time.deltaTime) + "";
-    }
-
-    private void Win()
-    {
         if (!win && Coins.Count <= 0)
         {
             win = true;
-            winDialog.SetActive(true);
+            WinEvent?.Invoke();
         }
+
+        FPSTxt.text = "FPS: "+(int)(1 / Time.deltaTime) + "";
     }
 
     private void CreateCoins()

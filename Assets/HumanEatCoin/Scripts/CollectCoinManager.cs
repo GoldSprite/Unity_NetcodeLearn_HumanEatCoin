@@ -5,13 +5,20 @@ using UnityEngine;
 
 public class CollectCoinManager : MonoBehaviour
 {
+    public static CollectCoinManager Instance { get; private set; }
     public Transform CoinBasketCenterTrans;
     private List<Transform> coins => GameManager.Instance.Coins;
     public float GetPointRange = 1;
     public int CoinPoint { get => GameManager.Instance.CoinPoint; set => GameManager.Instance.CoinPoint=value; }
 
+    private void Start()
+    {
+        Instance = this;
+    }
+
     private void Update()
     {
+        GameManager.Instance.Coins = coins.Where(p=>p!=null).ToList();
         var coinsToRemove = coins.Where(coin => Vector3.Distance(CoinBasketCenterTrans.position, coin.position) < GetPointRange).ToList();
 
         foreach (var coin in coinsToRemove)
