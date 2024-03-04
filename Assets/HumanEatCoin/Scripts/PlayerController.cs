@@ -1,3 +1,4 @@
+using GoldSprite.TestSyncTemp;
 using System;
 using UnityEngine;
 
@@ -14,22 +15,29 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float rotForce = 4;
 
+    private TestSyncPropsHandler syncHandler;
+
     public void Start()
     {
         rb = GetComponent<Rigidbody>();
+        syncHandler = GetComponent<TestSyncPropsHandler>();
     }
 
     private void Update()
     {
         var v = Input.GetAxis("Vertical");
-        if (v == 0) v = Joy.Vertical;
         var h = Input.GetAxis("Horizontal");
-        if (h == 0) h = Joy.Horizontal;
+        if (Joy != null)
+        {
+            if (v == 0) v = Joy.Vertical;
+            if (h == 0) h = Joy.Horizontal;
+        }
 
         var laterPos = GetNextPos(v);
         var laterRotation = GetNextRotation(h);
 
-        rb.MovePosition(laterPos);
+        //rb.MovePosition(laterPos);
+        syncHandler.UploadMove(GetNextVec(v), rb);
         Player.rotation = laterRotation;
         //·À×²ÐÞÕý
         rb.velocity = rb.angularVelocity = Vector3.zero;
@@ -45,8 +53,14 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 GetNextPos(float v)
     {
-        var distance = v * Player.forward * moveVel * 1/60f;
+        var distance = GetNextVec(v);
         var laterPos = Player.position + distance;
         return laterPos;
+    }
+
+    private Vector3 GetNextVec(float v)
+    {
+        var distance = v * Player.forward * moveVel * 1/60f;
+        return distance;
     }
 }

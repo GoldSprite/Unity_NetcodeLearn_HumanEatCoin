@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -57,7 +58,7 @@ public class SpecialEventManager : MonoBehaviour
                 }
             }
         }
-        catch (Exception e) { }
+        catch (Exception) { }
     }
 
     private void RandomSpawnWindmill(Vector3 spawnCenter)
@@ -67,6 +68,7 @@ public class SpecialEventManager : MonoBehaviour
         if (isSpawn)
         {
             var obj = Instantiate(WindmillPrefab, GameElementsParent);
+            var nwObj = obj.GetComponent<NetworkObject>();
             var trans = obj.transform;
             var range = 1.3f;
             var randomPos = new Vector3(
@@ -79,6 +81,8 @@ public class SpecialEventManager : MonoBehaviour
             var windmill = trans.GetComponentInChildren<RotationWindmill>();
             windmill.moveVel = dir.normalized * UnityEngine.Random.Range(-1f, 1f) * 6;
             trans.localScale = Vector3.one * UnityEngine.Random.Range(0.3f, 2f);
+
+            nwObj.Spawn();
         }
     }
 }

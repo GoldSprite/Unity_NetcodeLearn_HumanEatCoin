@@ -22,11 +22,12 @@ public class RotationWindmill : MonoBehaviour
 
     private IEnumerator DelTask()
     {
-        yield return new WaitForSeconds(existsTime);
+        yield return new WaitForSeconds(existsTime/2f);
 
         var materials = GetComponentsInChildren<MeshRenderer>()?.Select(p => p.materials)?.ToList();
         if (materials != null && materials.Count > 0)
         {
+            var fadeTime = existsTime/2f;
             var fadeRate = 30f;
             for (int i = 0; i < fadeRate; i++)
             {
@@ -37,7 +38,7 @@ public class RotationWindmill : MonoBehaviour
                         c.a -= 1 / fadeRate;
                         material.color = c;
                     }
-                yield return new WaitForSeconds(1 / fadeRate);
+                yield return new WaitForSeconds(fadeTime / fadeRate);
             }
         }
         Destroy(gameObject);

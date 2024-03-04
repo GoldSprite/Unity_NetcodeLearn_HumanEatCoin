@@ -28,4 +28,6 @@ public class WinDialogManager : MonoBehaviour
                                $"{(time.Seconds > 0 ? time.Seconds + "s" : "")}";
         SpendTimes.text = "SpendTime: "+ formattedTime;
     }
+
+    public void CloseWindDialog() { winDialog.SetActive(false); }
 }

@@ -11,6 +11,8 @@ public class CollectCoinManager : MonoBehaviour
     public float GetPointRange = 1;
     public int CoinPoint { get => GameManager.Instance.CoinPoint; set => GameManager.Instance.CoinPoint=value; }
 
+    public Animator GetPointTip;
+
     private void Start()
     {
         Instance = this;
@@ -27,6 +29,8 @@ public class CollectCoinManager : MonoBehaviour
             Destroy(coin.gameObject);
             CoinPoint++;
             Debug.Log("»ýÒ»·Ö");
+            GetPointTip.gameObject.SetActive(true);
+            GetPointTip.Play("Default", 0, 0);
         }
 
 
