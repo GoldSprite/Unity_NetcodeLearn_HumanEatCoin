@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     public bool Win { get; set; }
     public static Action WinEvent;
 
-    public Text FPSTxt;
+    public Text DevsVersion;
 
     public bool IsConnected { get; set; }
     public bool IsCoinSpawned { get; set; }
@@ -49,6 +49,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        DevsVersion.text = "Devs_"+Application.version;
         Application.targetFrameRate = 240;
 
         Instance = this;
