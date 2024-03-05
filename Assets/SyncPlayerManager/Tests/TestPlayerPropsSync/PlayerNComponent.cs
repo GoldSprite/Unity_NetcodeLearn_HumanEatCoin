@@ -33,6 +33,10 @@ public class PlayerNComponent : NetworkBehaviour
     public bool GravityLock = true;
     public bool VelLock = true;
     public bool AVelLock = true;
+    public bool RotLock = true;
+    public bool RotHalfLock = true;
+    public float HalfLockAngle = 45;
+    public float AngleBackVelRate = 20;
 
     //public RelayPlayer player;
     //public RelayPlayer Player
@@ -237,9 +241,9 @@ public class PlayerNComponent : NetworkBehaviour
     private void HandleData()
     {
         //·À×²ÐÞÕý
-        var lVel = rb.velocity; 
+        var lVel = rb.velocity;
         if (VelLock) { lVel.x = lVel.z = 0; }
-        if(GravityLock)lVel.y = 0;
+        if (GravityLock) lVel.y = 0;
         rb.velocity = lVel;
 
         var lAnguVel = rb.angularVelocity;
@@ -304,7 +308,7 @@ public class PlayerNComponent : NetworkBehaviour
     {
         var lVelY = rb.velocity.y;
         var distance = v * transform.forward * MoveVel * 1 / 60f;
-        if(!GravityLock) distance.y = lVelY;
+        if (!GravityLock) distance.y = lVelY;
         return distance;
     }
 
@@ -313,7 +317,26 @@ public class PlayerNComponent : NetworkBehaviour
     {
         var rotate = Quaternion.Euler(0, h * rotForce, 0);
         var rotation = transform.rotation * rotate;
-        rotation.x = rotation.z = 0;
+        var rotEuler = rotation.eulerAngles;
+        if (RotLock) rotEuler.x = rotEuler.z = 0;
+        if (RotHalfLock)
+        {
+            var backAngle = HalfLockAngle;
+            //var backAngle = 10;
+            //if (Math.Abs(rotEuler.x) > HalfLockAngle) rotEuler.x = Math.Clamp(rotEuler.x, -backAngle, backAngle);
+            //if (Math.Abs(rotEuler.z) > HalfLockAngle) rotEuler.z = Math.Clamp(rotEuler.x, -backAngle, backAngle);
+
+            rotEuler.x = Mathf.Lerp(rotEuler.x, 0, rotEuler.x / backAngle * Time.fixedDeltaTime * AngleBackVelRate);
+            rotEuler.z = Mathf.Lerp(rotEuler.z, 0, rotEuler.z / backAngle * Time.fixedDeltaTime * AngleBackVelRate);
+        }
+        //var halfLockAngleEuler = HalfLockAngle / 360f;
+        //if(RotHalfLock && (Math.Abs(rotation.x) > halfLockAngleEuler || Math.Abs(rotation.z) > halfLockAngleEuler)){
+        //    var backAngle = halfLockAngleEuler - 10/360f;
+        //    rotation.x = Math.Clamp(rotation.x, -backAngle, backAngle);
+        //    rotation.z = Math.Clamp(rotation.z, -backAngle, backAngle);
+        //    rotation.x = rotation.z = 0;
+        //}
+        rotation.eulerAngles = rotEuler;
         return rotation;
     }
 
