@@ -38,7 +38,6 @@ public class GameManager : MonoBehaviour
 
     public Text DevsVersion;
 
-    public bool IsConnected { get; set; }
     public bool IsCoinSpawned { get; set; }
 
     public float resetHigh = -10;
@@ -86,19 +85,19 @@ public class GameManager : MonoBehaviour
             ResetLowHighPlayer(coin);
         }
 
-        var cMes =
-            "IsConnectedClient: "+networkManager.IsConnectedClient 
-            +", "+
-            "IsHost: " + networkManager.IsHost 
-            +", "+
-            "IsClient: " + networkManager.IsClient 
-            +", "+
-            "IsApproved: " + networkManager.IsApproved 
-            +", "+
-            "";
-        Debug.Log(cMes);
-        IsConnected = false;
-        try { IsConnected = networkManager.IsApproved; } catch (Exception) { }
+        //var cMes =
+        //    "IsConnectedClient: "+networkManager.IsConnectedClient 
+        //    +", "+
+        //    "IsHost: " + networkManager.IsHost 
+        //    +", "+
+        //    "IsClient: " + networkManager.IsClient 
+        //    +", "+
+        //    "IsApproved: " + networkManager.IsApproved 
+        //    +", "+
+        //    "";
+        //Debug.Log(cMes);
+        //IsConnected = false;
+        //try { IsConnected = networkManager.IsApproved; } catch (Exception) { }
         //Debug.Log($"IsConnected: {IsConnected}");
         //FPSTxt.text = 
         //    "FPS: " + (int)(1 / Time.deltaTime) + "\n"+

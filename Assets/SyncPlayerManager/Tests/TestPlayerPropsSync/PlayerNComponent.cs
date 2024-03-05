@@ -14,6 +14,7 @@ public class PlayerNComponent : NetworkBehaviour
     public static uint LocalPlayerTransportId = 0;
 
     public NetworkVariable<FixedString512Bytes> syncName = new();
+    public NetworkVariable<ulong> syncNId = new();
     public Text Name_Tag;
     public Rigidbody rb;
     public NetworkVariable<Vector3> syncPos = new();
@@ -53,14 +54,48 @@ public class PlayerNComponent : NetworkBehaviour
     //    }
     //}
 
+
+
+    void Start()
+    {
+        if (IsLocalPlayer)
+        {
+            Debug.Log("LocalPlayer-Start.");
+            TestManager2.Instance.IsConnected = true;
+        }
+
+        if (IsLocalPlayer)
+            LocalPlayer = this;
+
+        rb = GetComponent<Rigidbody>();
+        Joy = FindObjectOfType<Joystick>();
+    }
+
+
+    public override void OnNetworkDespawn()
+    {
+        if (IsLocalPlayer)
+        {
+            Debug.Log("LocalPlayer-DeSpawn.");
+            TestManager2.Instance.IsConnected = false;
+        }
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
+        if (IsLocalPlayer)
+        {
+            Debug.Log("LocalPlayer-Spawn.");
+            TestManager2.Instance.IsConnected = true;
+        }
+
         if (IsLocalPlayer)
         {
             GameManager.Instance.PlayerTrans = transform;
             //LocalPlayerTransportId = 
-            Debug.Log("本机玩家生成, 已连接连接远程房间.");
+            Debug.Log("本机玩家生成, 已连接远程房间.");
             ChatManager.Instance.ClearChatMessage();
             if (IsServer)
             {
@@ -77,26 +112,6 @@ public class PlayerNComponent : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    private void sendCoinsPos_ClientRpc(string guid, Vector3 v)
-    {
-        if (IsLocalPlayer)
-        {
-            syncCoinsPos[guid].Value = v;
-        }
-    }
-
-
-    void Start()
-    {
-        if (IsLocalPlayer)
-            LocalPlayer = this;
-
-        rb = GetComponent<Rigidbody>();
-        Joy = FindObjectOfType<Joystick>();
-    }
-
-
     Joystick Joy;
     float v, h;
     bool isInit;
@@ -110,16 +125,20 @@ public class PlayerNComponent : NetworkBehaviour
             if (h == 0) h = Joy.Horizontal;
         }
 
-
-        try
+        if (TestManager2.Instance.LocalNId == 0 && IsSpawned && IsLocalPlayer)
         {
-            var localPlayer = TestManager.Instance.netTrans.GetCurrentPlayer();
-            if (!isInit)
-            {
-                isInit = true;
-            }
+            TestManager2.Instance.LocalNId = GetComponent<NetworkObject>().OwnerClientId;
         }
-        catch (Exception) { }
+
+        //try
+        //{
+        //    var localPlayer = TestManager.Instance.netTrans.GetCurrentPlayer();
+        //    if (!isInit)
+        //    {
+        //        isInit = true;
+        //    }
+        //}
+        //catch (Exception) { }
 
 
         //操作与上载
@@ -162,6 +181,14 @@ public class PlayerNComponent : NetworkBehaviour
                 }
             }
 
+            if (IsServer)
+            {
+                var roomPlayerCount = TestManager2.Instance.networkManager.ConnectedClientsIds.Count;
+                TestManager2.Instance.RoomPlayerCount = roomPlayerCount;
+                //Debug.Log($"发送roomPlayerCount:{roomPlayerCount}");
+                SendRoomPlayerCountEvent_ClientRpc(roomPlayerCount);
+            }
+
         }
 
         //下载
@@ -174,6 +201,16 @@ public class PlayerNComponent : NetworkBehaviour
 
         //Debug.Log($"来自{(IsServer ? "服务端" : "客户端")}-{(IsLocalPlayer ? "本地" : "非本地")}数据: 位置:{syncPos.Value}, 移动:, {syncName.Value}, Properties-Ready:{syncReady.Value}");
 
+    }
+
+    [ClientRpc]
+    private void SendRoomPlayerCountEvent_ClientRpc(int roomPlayerCount)
+    {
+        if (IsOwnedByServer)
+        {
+            //Debug.Log($"接收到roomPlayerCount:{roomPlayerCount}");
+            TestManager2.Instance.RoomPlayerCount = roomPlayerCount;
+        }
     }
 
     [ClientRpc]
@@ -341,22 +378,22 @@ public class PlayerNComponent : NetworkBehaviour
     }
 
 
-    internal void CGReady()
-    {
-        if (IsServer)
-        {
-            syncReady.Value = !syncReady.Value;
-        }
-        else
-        {
-            CGReady_ServerRPC(!syncReady.Value);
-        }
-    }
+    //internal void CGReady()
+    //{
+    //    if (IsServer)
+    //    {
+    //        syncReady.Value = !syncReady.Value;
+    //    }
+    //    else
+    //    {
+    //        CGReady_ServerRPC(!syncReady.Value);
+    //    }
+    //}
 
-    [ServerRpc]
-    public void CGReady_ServerRPC(bool val)
-    {
-        syncReady.Value = val;
-    }
+    //[ServerRpc]
+    //public void CGReady_ServerRPC(bool val)
+    //{
+    //    syncReady.Value = val;
+    //}
 
 }

@@ -231,29 +231,31 @@ namespace GoldSprite.LobbyRoomUI
             StartCoroutine(JoinRoomTask());
         }
 
-        private IEnumerator JoinRoomTask()
+        private IEnumerator JoinRoomTask(int type = 0)
         {
             var exit = 0;
-            var startTime = DateTime.Now.Ticks;
+            var startTime = DateTime.Now.TimeOfDay.TotalMilliseconds;
             var timeOut = 3000;
-            while (exit==0)
+            while (exit == 0)
             {
-                if(startTime + timeOut < DateTime.Now.Ticks)
+                if (startTime + timeOut < DateTime.Now.TimeOfDay.TotalMilliseconds)
                 {
                     exit = 1;
-                    CreateRoomTip_Txt.text = "连接超时";
-                }else if (GameManager.Instance.IsConnected)
+                    CreateRoomTip_Txt.text = (type == 1 ? "创建房间" : "连接房间") + "超时.";
+                }
+                else if (TestManager2.Instance.IsConnected)
                 {
                     exit = 2;
-                    CreateRoomTip_Txt.text = "连接成功";
+                    CreateRoomTip_Txt.text = (type == 1 ? "创建房间" : "连接房间") + "成功.";
+                    yield return new WaitForSeconds(0.8f);
                 }
 
                 yield return new WaitForSeconds(0.2f);
             }
-            if(exit==2) CGGameWindow();
+            if (exit == 2) CGWindow(RoomWindow);
         }
 
-        public void InitRoom(uint playerTransportID=default(uint), RelayRoom room=null)
+        public void InitRoom(uint playerTransportID = default(uint), RelayRoom room = null)
         {
             CGWindow(RoomWindow);
             StopQueryLobbyRoomListTask();
@@ -309,9 +311,9 @@ namespace GoldSprite.LobbyRoomUI
             //var playerNWObj = networkManager.LocalClient.PlayerObject;
             //var relayPlayer = netTrans.GetRoomInfo().Players.Values.First(p => p.ID == NetworkGameManager.Instance.PlayerGuid);
             ////netTrans.KickPlayer(relayPlayer.TransportId);
-            ////networkManager.DisconnectClient(networkManager.LocalClientId);
+            ////networkManager.DisconnectClient(networkManager.LocalNId);
             ////networkManager.Shutdown();
-            //var randomOtherClientId = networkManager.ConnectedClientsIds.First(p => p != networkManager.LocalClientId);
+            //var randomOtherClientId = networkManager.ConnectedClientsIds.First(p => p != networkManager.LocalNId);
             //netTrans.GetRoomInfo().MasterClientID = randomOtherClientId;
             //ExitRoomUI();
         }
@@ -346,39 +348,8 @@ namespace GoldSprite.LobbyRoomUI
             else
             {
                 CreateRoomTip_Txt.text = "开始连接远程房间..";
-
-                //var request = new CreateRoomRequest()
-                //{
-                //    Namespace = RoomNameSpace,
-                //    Name = CreateRoomNameInput.text,
-                //    MaxPlayers = 4,
-                //    OwnerId = playerGuid,
-                //    Visibility = LobbyRoomVisibility.Public
-                //};
-                //StartCoroutine(LobbyService.AsyncCreateRoom(request, (resp) =>
-                //{
-                //    if (resp.Code != (uint)RelayCode.OK)
-                //    {
-                //        CreateRoomTip_Txt.text = "远程房间创建失败.";
-                //    }
-                //    else
-                //    {
-                //        netTrans.SetRoomData(resp);
-                //        if (!netTrans.CheckRequirement())
-                //        {
-                //            CreateRoomTip_Txt.text = "客户端配置不全.";
-                //        }
-                //        else
-                //        {
-                //            networkManager.StartHost();
-                //            Debug.Log("房间创建成功.");
-                //            CreateRoomTip_Txt.text = "";
-                //            CreateRoomToggle.CGDroping?.Invoke();
-                //            EnterRoomEvent?.Invoke();
-                //            CGGameWindow();
-                //        }
-                //    }
-                //}));
+                TestManager2.Instance.StartHost();
+                StartCoroutine(JoinRoomTask(1));
             }
         }
 

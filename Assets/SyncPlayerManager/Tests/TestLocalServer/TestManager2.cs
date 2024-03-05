@@ -41,6 +41,9 @@ namespace GoldSprite.TestSyncTemp
 
         public bool IsConnected { get; set; }
         public uint LocalPlayerTransportId { get; set; }
+        public int RoomPlayerCount { get; set; }
+
+        public ulong LocalNId = 0;
 
 
         private void Start()
@@ -55,10 +58,15 @@ namespace GoldSprite.TestSyncTemp
 
         private void Update()
         {
+            //Debug.Log("IsConnected: "+ IsConnected);
+
             Info_Txt.text =
                 HostIP +
                 "\nPing: " + (IsConnected ? netTrans.GetCurrentRtt(netTrans.ServerClientId) : -1) + "ms" +
-                "\nFPS: " + (int)(1 / Time.deltaTime)
+                "\nFPS: " + (int)(1 / Time.deltaTime)+
+                "\nIsConnected: "+ IsConnected + 
+                "\nLocalClientId: " + LocalNId +
+                "\nRoomPlayerCount: " + RoomPlayerCount
                 ;
         }
 
@@ -66,14 +74,12 @@ namespace GoldSprite.TestSyncTemp
         {
             netTrans.SetConnectionData(localIp, port);
             networkManager.StartHost();
-            LobbyRoomManager.Instance.CGWindow(LobbyRoomManager.Instance.RoomWindow);
         }
 
         public void StartClient()
         {
             netTrans.SetConnectionData(networkIp, port);
             networkManager.StartClient();
-            LobbyRoomManager.Instance.CGWindow(LobbyRoomManager.Instance.RoomWindow);
         }
 
         public void Shutdown()

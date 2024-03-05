@@ -3840,14 +3840,14 @@ PrefabInstance:
     - target: {fileID: 8605418248546232360, guid: 74e865e048f3a4e4ebbed248c21346ea, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 777781079}
+      objectReference: {fileID: 1780109343}
     - target: {fileID: 8605418248546232360, guid: 74e865e048f3a4e4ebbed248c21346ea, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: StartHost
+      value: CreateAndJoinRoomBtn
       objectReference: {fileID: 0}
     - target: {fileID: 8605418248546232360, guid: 74e865e048f3a4e4ebbed248c21346ea, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GoldSprite.TestSyncTemp.TestManager2, Assembly-CSharp
+      value: GoldSprite.LobbyRoomUI.LobbyRoomManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8605418248971406911, guid: 74e865e048f3a4e4ebbed248c21346ea, type: 3}
       propertyPath: m_IsActive
@@ -5276,11 +5276,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1498548219 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 333651314887323000, guid: 74e865e048f3a4e4ebbed248c21346ea, type: 3}
-  m_PrefabInstance: {fileID: 913099410}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1529263738
 GameObject:
   m_ObjectHideFlags: 0
@@ -6000,26 +5995,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8be670ac4ae332b46a6689023d65dd14, type: 3}
---- !u!1 &1778529122 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8344545964399566446, guid: 8be670ac4ae332b46a6689023d65dd14, type: 3}
-  m_PrefabInstance: {fileID: 1778529121}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1778529123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778529122}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39bb73620d6fb9641b57b3355b08be40, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  DropView: {fileID: 1498548219}
-  isDroping: 0
-  scrollToTop: 1
 --- !u!114 &1780109343 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1969302225502523275, guid: 74e865e048f3a4e4ebbed248c21346ea, type: 3}
