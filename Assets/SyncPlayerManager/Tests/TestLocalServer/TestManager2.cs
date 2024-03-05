@@ -62,6 +62,7 @@ namespace GoldSprite.TestSyncTemp
 
             Info_Txt.text =
                 HostIP +
+                "\nServer: "+networkIp+":"+port+
                 "\nPing: " + (IsConnected ? netTrans.GetCurrentRtt(netTrans.ServerClientId) : -1) + "ms" +
                 "\nFPS: " + (int)(1 / Time.deltaTime)+
                 "\nIsConnected: "+ IsConnected + 

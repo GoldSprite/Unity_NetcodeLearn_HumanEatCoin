@@ -127,7 +127,7 @@ public class PlayerNComponent : NetworkBehaviour
 
         if (TestManager2.Instance.LocalNId == 0 && IsSpawned && IsLocalPlayer)
         {
-            TestManager2.Instance.LocalNId = GetComponent<NetworkObject>().OwnerClientId;
+            TestManager2.Instance.LocalNId = this.OwnerClientId;
         }
 
         //try
