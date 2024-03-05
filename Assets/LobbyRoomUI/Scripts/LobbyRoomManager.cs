@@ -1,18 +1,19 @@
 using GoldSprite.AutoListUI;
 using GoldSprite.BasicUIs;
 using GoldSprite.MySyncPlayerManager;
+using GoldSprite.TestSyncTemp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using Unity.Sync.Relay;
 using Unity.Sync.Relay.Lobby;
 using Unity.Sync.Relay.Model;
 using Unity.Sync.Relay.Transport.Netcode;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static GoldSprite.MySyncPlayerManager.NetworkGameManager;
 
@@ -27,7 +28,7 @@ namespace GoldSprite.LobbyRoomUI
         public NetworkGameManager nwManager => NetworkGameManager.Instance;
 
         private NetworkManager networkManager;
-        private RelayTransportNetcode netTrans;
+        private UnityTransport netTrans;
         private RelayCallbacks callbacks;
 
         public static Action EnterRoomEvent;
@@ -58,7 +59,6 @@ namespace GoldSprite.LobbyRoomUI
         private Coroutine Refresh_RoomPlayerListTask;
 
         public Dictionary<uint, RelayPlayer> roomPlayers;
-        private RelayRoom relayRoom => netTrans.GetRoomInfo();
         private RelayPlayer localPlayer;
         public RelayPlayer LocalPlayer => localPlayer;
         private string playerGuid => nwManager.PlayerGuid;
@@ -67,20 +67,7 @@ namespace GoldSprite.LobbyRoomUI
         {
             Instance = this;
             networkManager = NetworkManager.Singleton;
-            netTrans = networkManager.GetComponent<RelayTransportNetcode>();
-
-            callbacks = new RelayCallbacks();
-            netTrans.SetCallbacks(callbacks);
-            callbacks.RegisterConnectToRelayServer((id, roomInfo) =>
-            {
-                var transportId = netTrans.GetCurrentPlayer().TransportId;
-                InitRoom(transportId, roomInfo);
-            });
-            callbacks.RegisterPlayerKicked((code, mes) =>
-            {
-                Debug.Log($"已被踢出房间: Reason: Code-{code}, Mes: {mes}.");
-                ExitRoomUI();
-            });
+            netTrans = networkManager.GetComponent<UnityTransport>();
 
             CGWindow(LobbyWindow);
 
@@ -93,16 +80,16 @@ namespace GoldSprite.LobbyRoomUI
         private void Update()
         {
             //Debug.Log($"networkManager.IsConnectedClient: {networkManager.IsConnectedClient}, IsRooming: {IsRooming()}");
-            if (currentWindow == RoomWindow && !IsRooming())
-            {
-                ExitRoomUI();
-            }
+            //if (currentWindow == RoomWindow && !IsRooming())
+            //{
+            //    ExitRoomUI();
+            //}
         }
 
-        public bool IsRooming()
-        {
-            return !(relayRoom.Players == null || relayRoom.Players.Count <= 0 || !relayRoom.Players.ContainsKey(localPlayer.TransportId));
-        }
+        //public bool IsRooming()
+        //{
+        //    return !(relayRoom.Players == null || relayRoom.Players.Count <= 0 || !relayRoom.Players.ContainsKey(localPlayer.TransportId));
+        //}
 
         //[ContextMenu("QueryRoomList")]
         //public void QueryRoomList()
@@ -112,52 +99,52 @@ namespace GoldSprite.LobbyRoomUI
 
         public void QueryLobbyRoomList()
         {
-            var request = new ListRoomRequest()
-            {
-                Namespace = RoomNameSpace,
-                Start = 0,
-                Count = queryRoomCount
-            };
+            //var request = new ListRoomRequest()
+            //{
+            //    Namespace = RoomNameSpace,
+            //    Start = 0,
+            //    Count = queryRoomCount
+            //};
 
-            StartCoroutine(LobbyService.AsyncListRoom(request, (resp) =>
-            {
-                if (resp.Code != (uint)RelayCode.OK)
-                {
-                    //Debug.Log("查询房间失败.");
-                }
-                else
-                {
-                    lobbyRooms = resp.Items;
-                    //移除解散的房间
-                    var removeList = LobbyListView.GetItems().Keys.Where(roomUuid => !lobbyRooms.Any(p => p.RoomUuid == (string)roomUuid)).ToList();
-                    foreach (var roomUuid in removeList) LobbyListView.RemoveItem(roomUuid);
+            //StartCoroutine(LobbyService.AsyncListRoom(request, (resp) =>
+            //{
+            //    if (resp.Code != (uint)RelayCode.OK)
+            //    {
+            //        //Debug.Log("查询房间失败.");
+            //    }
+            //    else
+            //    {
+            //        lobbyRooms = resp.Items;
+            //        //移除解散的房间
+            //        var removeList = LobbyListView.GetItems().Keys.Where(roomUuid => !lobbyRooms.Any(p => p.RoomUuid == (string)roomUuid)).ToList();
+            //        foreach (var roomUuid in removeList) LobbyListView.RemoveItem(roomUuid);
 
-                    if (resp.Items.Count <= 0)
-                    {
-                        //Debug.Log("查询房间数为空.");
-                    }
-                    else
-                    {
-                        //Debug.Log($"查询房间数成功: {resp.Items.Count}个房间.");
+            //        if (resp.Items.Count <= 0)
+            //        {
+            //            //Debug.Log("查询房间数为空.");
+            //        }
+            //        else
+            //        {
+            //            //Debug.Log($"查询房间数成功: {resp.Items.Count}个房间.");
 
-                        lobbyRooms = resp.Items;
+            //            lobbyRooms = resp.Items;
 
-                        //刷新增加的房间
-                        foreach (var room in lobbyRooms)
-                        {
-                            LobbyListView.AddItem(room.RoomUuid);  //增加新房间信息
+            //            //刷新增加的房间
+            //            foreach (var room in lobbyRooms)
+            //            {
+            //                LobbyListView.AddItem(room.RoomUuid);  //增加新房间信息
 
-                            //刷新房间信息
-                            var roomItem = LobbyListView.GetItem<string, LobbyAutoListItem>(room.RoomUuid);
-                            roomItem.Name = room.Name;
-                            roomItem.RoomPlayerCount = room.PlayerCount;
-                            roomItem.MaxRoomPlayers = room.MaxPlayers;
-                            roomItem.roomInfo = room;
-                            roomItem.UpdateContent();
-                        }
-                    }
-                }
-            }));
+            //                //刷新房间信息
+            //                var roomItem = LobbyListView.GetItem<string, LobbyAutoListItem>(room.RoomUuid);
+            //                roomItem.Name = room.Name;
+            //                roomItem.RoomPlayerCount = room.PlayerCount;
+            //                roomItem.MaxRoomPlayers = room.MaxPlayers;
+            //                roomItem.roomInfo = room;
+            //                roomItem.UpdateContent();
+            //            }
+            //        }
+            //    }
+            //}));
         }
 
         public IEnumerator QueryLobbyRoomListTask()
@@ -215,30 +202,58 @@ namespace GoldSprite.LobbyRoomUI
 
         public void JoinRoom(LobbyRoom room)
         {
-            StartCoroutine(LobbyService.AsyncQueryRoom(room.RoomUuid, (resp) =>
-            {
-                if (resp.Code != (uint)RelayCode.OK)
-                {
-                    Debug.Log("加入房间失败.");
-                }
-                else
-                {
-                    netTrans.SetRoomData(resp);
-                    if (!netTrans.CheckRequirement())
-                    {
-                        Debug.Log("加入房间失败: 配置不全.");
-                    }
-                    else
-                    {
-                        networkManager.StartClient();
-                        Debug.Log("加入房间成功.");
-                        EnterRoomEvent?.Invoke();
-                    }
-                }
-            }));
+            //StartCoroutine(LobbyService.AsyncQueryRoom(room.RoomUuid, (resp) =>
+            //{
+            //    if (resp.Code != (uint)RelayCode.OK)
+            //    {
+            //        Debug.Log("加入房间失败.");
+            //    }
+            //    else
+            //    {
+            //        netTrans.SetRoomData(resp);
+            //        if (!netTrans.CheckRequirement())
+            //        {
+            //            Debug.Log("加入房间失败: 配置不全.");
+            //        }
+            //        else
+            //        {
+            //            networkManager.StartClient();
+            //            Debug.Log("加入房间成功.");
+            //            EnterRoomEvent?.Invoke();
+            //        }
+            //    }
+            //}));
         }
 
-        public void InitRoom(uint playerTransportID, RelayRoom room)
+        public void JoinRoomBtn()
+        {
+            TestManager2.Instance.StartClient();
+            StartCoroutine(JoinRoomTask());
+        }
+
+        private IEnumerator JoinRoomTask()
+        {
+            var exit = 0;
+            var startTime = DateTime.Now.Ticks;
+            var timeOut = 3000;
+            while (exit==0)
+            {
+                if(startTime + timeOut < DateTime.Now.Ticks)
+                {
+                    exit = 1;
+                    CreateRoomTip_Txt.text = "连接超时";
+                }else if (GameManager.Instance.IsConnected)
+                {
+                    exit = 2;
+                    CreateRoomTip_Txt.text = "连接成功";
+                }
+
+                yield return new WaitForSeconds(0.2f);
+            }
+            if(exit==2) CGGameWindow();
+        }
+
+        public void InitRoom(uint playerTransportID=default(uint), RelayRoom room=null)
         {
             CGWindow(RoomWindow);
             StopQueryLobbyRoomListTask();
@@ -247,7 +262,7 @@ namespace GoldSprite.LobbyRoomUI
             RoomWindow_PlayerName_Txt.text = localPlayer.Name;
 
             roomPlayers = room.Players;
-            StartRefreshRoomPlayerListTask();
+            //StartRefreshRoomPlayerListTask();
         }
 
         public void ExitRoomUI()
@@ -289,34 +304,36 @@ namespace GoldSprite.LobbyRoomUI
 
         public void ExitRoomBtn()
         {
-            var playerNWObj = networkManager.LocalClient.PlayerObject;
-            var relayPlayer = netTrans.GetRoomInfo().Players.Values.First(p => p.ID == NetworkGameManager.Instance.PlayerGuid);
-            //netTrans.KickPlayer(relayPlayer.TransportId);
-            //networkManager.DisconnectClient(networkManager.LocalClientId);
-            //networkManager.Shutdown();
-            var randomOtherClientId = networkManager.ConnectedClientsIds.First(p => p != networkManager.LocalClientId);
-            netTrans.GetRoomInfo().MasterClientID = randomOtherClientId;
+            networkManager.Shutdown();
+            CGWindow(LobbyWindow);
+            //var playerNWObj = networkManager.LocalClient.PlayerObject;
+            //var relayPlayer = netTrans.GetRoomInfo().Players.Values.First(p => p.ID == NetworkGameManager.Instance.PlayerGuid);
+            ////netTrans.KickPlayer(relayPlayer.TransportId);
+            ////networkManager.DisconnectClient(networkManager.LocalClientId);
+            ////networkManager.Shutdown();
+            //var randomOtherClientId = networkManager.ConnectedClientsIds.First(p => p != networkManager.LocalClientId);
+            //netTrans.GetRoomInfo().MasterClientID = randomOtherClientId;
             //ExitRoomUI();
         }
 
         public void CloseRoomBtn()
         {
-            if (nwManager.IsRoomMaster())
-            {
-                StartCoroutine(LobbyService.AsyncCloseRoom(relayRoom.ID, (resp) =>
-                {
-                    if (resp.Code == (uint)RelayCode.OK)
-                    {
-                        Debug.Log("房主关闭房间.");
-                        networkManager.Shutdown();
-                    }
-                    else
-                    {
-                        Debug.Log($"关闭房间异常: {resp.Code}.");
-                    }
-                }));
-            }
-            ExitRoomUI();
+            //if (nwManager.IsRoomMaster())
+            //{
+            //    StartCoroutine(LobbyService.AsyncCloseRoom(relayRoom.ID, (resp) =>
+            //    {
+            //        if (resp.Code == (uint)RelayCode.OK)
+            //        {
+            //            Debug.Log("房主关闭房间.");
+            //            networkManager.Shutdown();
+            //        }
+            //        else
+            //        {
+            //            Debug.Log($"关闭房间异常: {resp.Code}.");
+            //        }
+            //    }));
+            //}
+            //ExitRoomUI();
         }
 
         public void CreateAndJoinRoomBtn()
@@ -329,38 +346,39 @@ namespace GoldSprite.LobbyRoomUI
             else
             {
                 CreateRoomTip_Txt.text = "开始连接远程房间..";
-                var request = new CreateRoomRequest()
-                {
-                    Namespace = RoomNameSpace,
-                    Name = CreateRoomNameInput.text,
-                    MaxPlayers = 4,
-                    OwnerId = playerGuid,
-                    Visibility = LobbyRoomVisibility.Public
-                };
-                StartCoroutine(LobbyService.AsyncCreateRoom(request, (resp) =>
-                {
-                    if (resp.Code != (uint)RelayCode.OK)
-                    {
-                        CreateRoomTip_Txt.text = "远程房间创建失败.";
-                    }
-                    else
-                    {
-                        netTrans.SetRoomData(resp);
-                        if (!netTrans.CheckRequirement())
-                        {
-                            CreateRoomTip_Txt.text = "客户端配置不全.";
-                        }
-                        else
-                        {
-                            networkManager.StartHost();
-                            Debug.Log("房间创建成功.");
-                            CreateRoomTip_Txt.text = "";
-                            CreateRoomToggle.CGDroping?.Invoke();
-                            EnterRoomEvent?.Invoke();
-                            CGGameWindow();
-                        }
-                    }
-                }));
+
+                //var request = new CreateRoomRequest()
+                //{
+                //    Namespace = RoomNameSpace,
+                //    Name = CreateRoomNameInput.text,
+                //    MaxPlayers = 4,
+                //    OwnerId = playerGuid,
+                //    Visibility = LobbyRoomVisibility.Public
+                //};
+                //StartCoroutine(LobbyService.AsyncCreateRoom(request, (resp) =>
+                //{
+                //    if (resp.Code != (uint)RelayCode.OK)
+                //    {
+                //        CreateRoomTip_Txt.text = "远程房间创建失败.";
+                //    }
+                //    else
+                //    {
+                //        netTrans.SetRoomData(resp);
+                //        if (!netTrans.CheckRequirement())
+                //        {
+                //            CreateRoomTip_Txt.text = "客户端配置不全.";
+                //        }
+                //        else
+                //        {
+                //            networkManager.StartHost();
+                //            Debug.Log("房间创建成功.");
+                //            CreateRoomTip_Txt.text = "";
+                //            CreateRoomToggle.CGDroping?.Invoke();
+                //            EnterRoomEvent?.Invoke();
+                //            CGGameWindow();
+                //        }
+                //    }
+                //}));
             }
         }
 

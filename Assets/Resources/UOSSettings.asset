@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a67a6ad6958142578ceda1d520aabfb, type: 3}
   m_Name: UOSSettings
   m_EditorClassIdentifier: 
-  encryptedAppID: AwYyQHHtQA/C5nDlM4dLQBO64800H/VcHKCsEeMuvIR5rLvy6fweqvx7pb1gA8Vm
-  encryptedAppSecret: U6DD2Q4GG46FU0NlOp0ZXw+lU4NiTpNVvwn+zHnEQIwJVkPd0NjIheoPt2LuLjI2
-  encryptedAppServiceSecret: U6DD2Q4GG46FU0NlOp0ZXw+lU4NiTpNVvwn+zHnEQIwJVkPd0NjIheoPt2LuLjI2
+  encryptedAppID: jNDXKpt8LldnTVQpzqc/43dJyScqHG39ycG5GuGzJHnVg45pm1L6Y6Go+q6KQwX1
+  encryptedAppSecret: rVorj2n93+UW6U8uHiBvv5lwvY0reTMYceo3yFwSG5N84yWh+CR+D0EL6MQh/0wv
+  encryptedAppServiceSecret: rVorj2n93+UW6U8uHiBvv5lwvY0reTMYceo3yFwSG5N84yWh+CR+D0EL6MQh/0wv

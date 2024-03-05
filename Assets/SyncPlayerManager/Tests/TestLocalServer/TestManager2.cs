@@ -1,3 +1,4 @@
+using GoldSprite.LobbyRoomUI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,6 +36,8 @@ namespace GoldSprite.TestSyncTemp
 
         public Text rttMs_Txt;
         public Text HostIp_Txt;
+        public string HostIP;
+        public Text Info_Txt;
 
         public bool IsConnected { get; set; }
         public uint LocalPlayerTransportId { get; set; }
@@ -46,25 +49,31 @@ namespace GoldSprite.TestSyncTemp
             networkManager = NetworkManager.Singleton;
             netTrans = networkManager.GetComponent<UnityTransport>();
 
-            HostIp_Txt.text = "HostIP: " + NetworkTools.GetNetworkIPV4();
+            HostIP = "HostIP: " + NetworkTools.GetNetworkIPV4();
 
         }
 
         private void Update()
         {
-            rttMs_Txt.text = "Ping: " + (IsConnected?netTrans.GetCurrentRtt(netTrans.ServerClientId):-1) + "ms";
+            Info_Txt.text =
+                HostIP +
+                "\nPing: " + (IsConnected ? netTrans.GetCurrentRtt(netTrans.ServerClientId) : -1) + "ms" +
+                "\nFPS: " + (int)(1 / Time.deltaTime)
+                ;
         }
 
         public void StartHost()
         {
             netTrans.SetConnectionData(localIp, port);
             networkManager.StartHost();
+            LobbyRoomManager.Instance.CGWindow(LobbyRoomManager.Instance.RoomWindow);
         }
 
         public void StartClient()
         {
             netTrans.SetConnectionData(networkIp, port);
             networkManager.StartClient();
+            LobbyRoomManager.Instance.CGWindow(LobbyRoomManager.Instance.RoomWindow);
         }
 
         public void Shutdown()

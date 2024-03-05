@@ -30,6 +30,10 @@ public class PlayerNComponent : NetworkBehaviour
 
     public float rotForce = 1.8f;
 
+    public bool GravityLock = true;
+    public bool VelLock = true;
+    public bool AVelLock = true;
+
     //public RelayPlayer player;
     //public RelayPlayer Player
     //{
@@ -233,7 +237,15 @@ public class PlayerNComponent : NetworkBehaviour
     private void HandleData()
     {
         //·À×²ÐÞÕý
-        rb.velocity = rb.angularVelocity = Vector3.zero;
+        var lVel = rb.velocity; 
+        if (VelLock) { lVel.x = lVel.z = 0; }
+        if(GravityLock)lVel.y = 0;
+        rb.velocity = lVel;
+
+        var lAnguVel = rb.angularVelocity;
+        if (AVelLock) { lAnguVel.x = lAnguVel.y = lAnguVel.z = 0; }
+        rb.angularVelocity = lAnguVel;
+
         rb.velocity = GetNextVelo();
         transform.rotation = GetNextRotation();
         name = Name_Tag.text = PlayerName;
@@ -290,7 +302,9 @@ public class PlayerNComponent : NetworkBehaviour
 
     private Vector3 GetNextVec(float v)
     {
+        var lVelY = rb.velocity.y;
         var distance = v * transform.forward * MoveVel * 1 / 60f;
+        if(!GravityLock) distance.y = lVelY;
         return distance;
     }
 

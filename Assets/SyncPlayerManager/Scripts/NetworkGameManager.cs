@@ -78,7 +78,7 @@ namespace GoldSprite.MySyncPlayerManager
         public void SetPlayerData(string guid, string name, Dictionary<string, string> props = null)
         {
             if (props == null) props = playerInitProps;
-            netTrans.SetPlayerData(guid, name, props);
+            //netTrans.SetPlayerData(guid, name, props);
         }
 
         internal void SetPlayerNameData(string name)

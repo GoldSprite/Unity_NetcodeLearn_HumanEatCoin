@@ -85,14 +85,25 @@ public class GameManager : MonoBehaviour
             ResetLowHighPlayer(coin);
         }
 
+        var cMes =
+            "IsConnectedClient: "+networkManager.IsConnectedClient 
+            +", "+
+            "IsHost: " + networkManager.IsHost 
+            +", "+
+            "IsClient: " + networkManager.IsClient 
+            +", "+
+            "IsApproved: " + networkManager.IsApproved 
+            +", "+
+            "";
+        Debug.Log(cMes);
         IsConnected = false;
-        try { IsConnected = netTrans.GetCurrentPlayer() != null; } catch (Exception) { }
-        Debug.Log($"IsConnected: {IsConnected}");
-        FPSTxt.text = 
-            "FPS: " + (int)(1 / Time.deltaTime) + "\n"+
-            "CloudMs: " + (IsConnected?netTrans.GetRelayServerRtt():-1)+ "\n"+
-            "HostMs: " + (IsConnected?netTrans.GetCurrentRtt(netTrans.ServerClientId):-1)
-            ;
+        try { IsConnected = networkManager.IsApproved; } catch (Exception) { }
+        //Debug.Log($"IsConnected: {IsConnected}");
+        //FPSTxt.text = 
+        //    "FPS: " + (int)(1 / Time.deltaTime) + "\n"+
+        //    "CloudMs: " + (IsConnected?netTrans.GetRelayServerRtt():-1)+ "\n"+
+        //    "HostMs: " + (IsConnected?netTrans.GetCurrentRtt(netTrans.ServerClientId):-1)
+        //    ;
         PointTxt.text = "·ÖÊý: " + coinPoint;
     }
 
