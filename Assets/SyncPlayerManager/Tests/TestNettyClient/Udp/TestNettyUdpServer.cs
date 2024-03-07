@@ -8,13 +8,18 @@ using UnityEngine;
 using System.Threading.Tasks;
 using System.Threading;
 
+using static GoldSprite.LogTools;
+using DotNetty.Buffers;
+using System.Text;
+using System.Net.Sockets;
+
 namespace GoldSprite.TestDotNetty
 {
-    public class TestNettyClient3 : MonoBehaviour
+    public class TestNettyUdpServer : MonoBehaviour
     {
         public Thread clientThread;
         private MultithreadEventLoopGroup group;
-        private IChannel clientChannel;
+        private SocketDatagramChannel serverChannel;
 
         async Task RunClientAsync()
         {
@@ -34,36 +39,41 @@ namespace GoldSprite.TestDotNetty
                 var bootstrap = new Bootstrap();
                 bootstrap
                     .Group(group)
-                    .Channel<TcpSocketChannel>()
-                    .Option(ChannelOption.TcpNodelay, true)
-                    .Handler(new ActionChannelInitializer<ISocketChannel>(channel =>
+                    .Channel<SocketDatagramChannel>()
+                    .Handler(new ActionChannelInitializer<IDatagramChannel>((ch =>
                     {
-                        IChannelPipeline pipeline = channel.Pipeline;
-
-                        //if (cert != null)
-                        //{
-                        //    pipeline.AddLast("tls", new TlsHandler(stream => new SslStream(stream, true, (sender, certificate, chain, errors) => true), new ClientTlsSettings(targetHost)));
-                        //}
-                        //pipeline.AddLast(new LoggingHandler());
-                        //pipeline.AddLast("framing-enc", new LengthFieldPrepender(2));
-                        //pipeline.AddLast("framing-dec", new LengthFieldBasedFrameDecoder(ushort.MaxValue, 0, 2, 0, 2));
-
-                        pipeline.AddLast("echo", new NettyClientHandler(this));
-                    }));
-
-                clientChannel = await bootstrap.ConnectAsync(TestNettyUdpClient.remoteAddress2);
-
-                //while (serverChannel.Active)
+                        IChannelPipeline pipeline = ch.Pipeline;
+                        pipeline.AddLast(new NettyUdpChannelInboundHandler(true));
+                    })));
+                //.Handler(new ActionChannelInitializer<ISocketChannel>(channel =>
                 //{
-                //    Task.Delay(1000).Wait();
-                //}
-                Debug.Log("线程任务已结束.");
+                //    IChannelPipeline pipeline = channel.Pipeline;
+
+                //    //if (cert != null)
+                //    //{
+                //    //    pipeline.AddLast("tls", new TlsHandler(stream => new SslStream(stream, true, (sender, certificate, chain, errors) => true), new ClientTlsSettings(targetHost)));
+                //    //}
+                //    //pipeline.AddLast(new LoggingHandler());
+                //    //pipeline.AddLast("framing-enc", new LengthFieldPrepender(2));
+                //    //pipeline.AddLast("framing-dec", new LengthFieldBasedFrameDecoder(ushort.MaxValue, 0, 2, 0, 2));
+
+                //    pipeline.AddLast("echo", new NettyClientHandler(this));
+                //}));
+
+                serverChannel = (SocketDatagramChannel) await bootstrap.BindAsync(TestNettyUdpClient.remoteAddress);
+
+                NLog(TestNettyUdpClient.remoteAddress2, "$ni.name : $ni.displayName");
+
+                //            ch.joinGroup(groupAddress, ni).sync();
+
+                NLog(TestNettyUdpClient.remoteAddress2, "udp server($groupAddress.hostName:$groupAddress.port) is running...");
 
                 //await serverChannel.CloseAsync();
             }
             catch (Exception e)
             {
                 Debug.Log(e);
+                StopClientChannel();
             }
             finally
             {
@@ -90,8 +100,8 @@ namespace GoldSprite.TestDotNetty
 
         public async Task CloseChannelSafe()
         {
-            Debug.Log("关闭本地频道...");
-            await clientChannel.CloseAsync();
+            NLog(TestNettyUdpClient.remoteAddress2, "关闭本地频道...");
+            await serverChannel.CloseAsync();
             await group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1));
         }
 

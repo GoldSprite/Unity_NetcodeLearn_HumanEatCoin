@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 325258096}
   - component: {fileID: 325258097}
+  - component: {fileID: 325258098}
   m_Layer: 0
   m_Name: TestNettyClient
   m_TagString: Untagged
@@ -162,9 +163,21 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 325258095}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb5d62460a708f74b8e8f611e91dad49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &325258098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325258095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e6101500ae6154a8d8cc797205ae66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1393852597
