@@ -3,6 +3,7 @@
 
 ## 简介: 
 ### 人类吃金币世界联机小游戏
+java服务器端项目日志github地址: https://github.com/GoldSprite/TestNetty
 
 本机服配置:   
 - localIp: 192.168.1.105
@@ -81,7 +82,13 @@
 1. 增加serverip-port显示
 1. PC窗口改为resizeWindow
 
-#### 24.3.5.5
+#### 24.3.7.0
+1. 创建C#NettyClient测试, 尝试连接javaNettyServer本地服
+    - 完成本地互联
+1. 总结签入: 
+    - 导入NuGetForUnity包以及其DotNetty相关包
+    - 增加TestNettyClient基本代码
+    - [重点!]: PlayerSettings Player otherSettings 里面关闭assemblyVersionValidation才能运行外部包(也就是NuGet相关包), 不记得报错也会告诉你
 
 
 ---  

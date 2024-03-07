@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/SyncPlayerManager/Tests/TestPlayerPropsSync/TestScene.unity
-    guid: a3d4e90e44ad6e74280ee6703f883012
+    path: Assets/SyncPlayerManager/Tests/TestNettyClient/New Scene.unity
+    guid: 20573d9b619568246a08e931a6ef812a
   m_configObjects: {}
