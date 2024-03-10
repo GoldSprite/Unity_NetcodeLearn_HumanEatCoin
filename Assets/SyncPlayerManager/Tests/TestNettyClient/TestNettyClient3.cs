@@ -51,7 +51,8 @@ namespace GoldSprite.TestDotNetty
                         pipeline.AddLast("echo", new NettyClientHandler(this));
                     }));
 
-                clientChannel = await bootstrap.ConnectAsync(TestNettyUdpClient.remoteAddress2);
+                var remoteAddress = new IPEndPoint(IPAddress.Parse("192.168.1.105"), 8001);
+                clientChannel = await bootstrap.ConnectAsync(remoteAddress);
 
                 //while (serverChannel.Active)
                 //{

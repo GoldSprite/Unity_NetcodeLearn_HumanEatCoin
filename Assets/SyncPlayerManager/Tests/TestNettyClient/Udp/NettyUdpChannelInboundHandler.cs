@@ -13,7 +13,7 @@ using static GoldSprite.TestDotNetty.TestNettyUdpClient;
 
 namespace GoldSprite.TestDotNetty
 {
-    public class NettyUdpChannelInboundHandler : SimpleChannelInboundHandler<DatagramPacket>
+    public class NettyUdpChannelInboundHandler : ChannelHandlerAdapter
     {
         bool isResponse;
 
@@ -24,21 +24,39 @@ namespace GoldSprite.TestDotNetty
         }
 
 
-        protected override void ChannelRead0(IChannelHandlerContext ctx, DatagramPacket msg)
+        public override void ChannelRead(IChannelHandlerContext context, object message)
         {
-            var buf = msg.Content;
-            String strMsg = buf.ToString(Encoding.UTF8);
-            NLog(remoteAddress2, "recv: "+ strMsg);
+            Debug.Log("收信");
+            //var buf = msg.Content;
+            //String strMsg = buf.ToString(Encoding.UTF8);
+            //NLog(remoteAddress2, "recv: "+ strMsg);
 
-            if (isResponse)
-            {
-                IByteBuffer buf1 = new UnpooledByteBufferAllocator(true).Buffer();
-                buf1.WriteBytes(Encoding.UTF8.GetBytes("ok"));
+            //if (isResponse)
+            //{
+            //    IByteBuffer buf1 = new UnpooledByteBufferAllocator(true).Buffer();
+            //    buf1.WriteBytes(Encoding.UTF8.GetBytes("ok"));
 
-                var packet = new DatagramPacket(buf1, msg.Sender);
+            //    var packet = new DatagramPacket(buf1, msg.Sender);
 
-                ctx.WriteAndFlushAsync(packet).Wait();
-            }
+            //    ctx.WriteAndFlushAsync(packet).Wait();
+            //}
         }
+        //protected override void ChannelRead0(IChannelHandlerContext ctx, object msg)
+        //{
+        //    Debug.Log("收信");
+        //    //var buf = msg.Content;
+        //    //String strMsg = buf.ToString(Encoding.UTF8);
+        //    //NLog(remoteAddress2, "recv: "+ strMsg);
+
+        //    //if (isResponse)
+        //    //{
+        //    //    IByteBuffer buf1 = new UnpooledByteBufferAllocator(true).Buffer();
+        //    //    buf1.WriteBytes(Encoding.UTF8.GetBytes("ok"));
+
+        //    //    var packet = new DatagramPacket(buf1, msg.Sender);
+
+        //    //    ctx.WriteAndFlushAsync(packet).Wait();
+        //    //}
+        //}
     }
 }

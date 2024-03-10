@@ -42,7 +42,9 @@ namespace GoldSprite.TestDotNetty
 
         protected override void ChannelRead0(IChannelHandlerContext ctx, object msg)
         {
-            Debug.Log("读到消息...");
+            var buf = (IByteBuffer)msg;
+            String strMsg = buf.ToString(Encoding.UTF8);
+            Debug.Log("读到消息..."+ strMsg);
         }
     }
 }

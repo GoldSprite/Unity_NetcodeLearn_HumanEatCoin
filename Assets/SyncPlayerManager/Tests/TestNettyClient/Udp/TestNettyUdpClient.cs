@@ -18,7 +18,8 @@ namespace GoldSprite.TestDotNetty
     {
         public Thread clientThread;
         private MultithreadEventLoopGroup group;
-        private SocketDatagramChannel clientChannel;
+        private IChannel clientChannel;
+        private IChannel clientChannel2;
 
 
         public const String addr1 = "10.0.0.2";
@@ -26,7 +27,7 @@ namespace GoldSprite.TestDotNetty
         public const String addr2 = "192.168.1.105";
         public const String addr2_w = "112.195.244.151";
         public static IPEndPoint remoteAddress = new IPEndPoint(IPAddress.Parse(addr2), 34001);  //localhost, 8888
-        public static IPEndPoint remoteAddress2 = new IPEndPoint(IPAddress.Parse(addr2_w), 34001);  //localhost, 8888
+        public static IPEndPoint remoteAddress2 = new IPEndPoint(IPAddress.Parse(addr2), 34001);  //localhost, 8888
         public static IPEndPoint localAddress = new IPEndPoint(IPAddress.Parse(addr2), 30001);  //localhost, 8888
         public static IPEndPoint localAddress2 = new IPEndPoint(IPAddress.Parse(addr2_w), 30001);  //localhost, 8888
 
@@ -49,7 +50,7 @@ namespace GoldSprite.TestDotNetty
                 bootstrap
                     .Group(group)
                     .Channel<SocketDatagramChannel>()
-                    .Handler(new ActionChannelInitializer<IDatagramChannel>((ch =>
+                    .Handler(new ActionChannelInitializer<IChannel>((ch =>
                     {
                         IChannelPipeline pipeline = ch.Pipeline;
                         pipeline.AddLast(new NettyUdpChannelInboundHandler(false));
@@ -69,7 +70,9 @@ namespace GoldSprite.TestDotNetty
                 //    pipeline.AddLast("echo", new NettyClientHandler(this));
                 //}));
 
-                clientChannel = (SocketDatagramChannel) await bootstrap.BindAsync(localAddress);
+                clientChannel2 = (IChannel) await bootstrap.BindAsync(localAddress);
+                if(clientChannel2.RemoteAddress != null)
+                    await clientChannel2.ConnectAsync(remoteAddress2);
 
                 //while (serverChannel.Active)
                 //{
@@ -87,15 +90,18 @@ namespace GoldSprite.TestDotNetty
                 //NLog(localAddress2, "已完成发送.");
 
 
-                var str = "你好你好.";
-                NLog(localAddress2, "发送消息: " + str);
-                IByteBuffer byteBuf = clientChannel.Allocator.Buffer();
-                var bytes = Encoding.UTF8.GetBytes(str);
-                byteBuf.WriteBytes(bytes);
+                for (int i = 0; i < 1; i++)
+                {
+                    var str = "你好你好.";
+                    NLog(localAddress2, "发送消息: " + str);
+                    IByteBuffer byteBuf = clientChannel2.Allocator.Buffer();
+                    var bytes = Encoding.UTF8.GetBytes(str);
+                    byteBuf.WriteBytes(bytes);
 
-                //var packet = new DatagramPacket(byteBuf, remoteAddress2);
-                await clientChannel.WriteAndFlushAsync(byteBuf);
-                NLog(localAddress2, "已完成发送.");
+                    var packet = new DatagramPacket(byteBuf, remoteAddress2);
+                    await clientChannel2.WriteAndFlushAsync(packet);
+                    NLog(localAddress2, "已完成发送.");
+                }
 
                 NLog(localAddress2, "线程任务已结束.");
 
@@ -132,8 +138,10 @@ namespace GoldSprite.TestDotNetty
         public async Task CloseChannelSafe()
         {
             NLog(localAddress2, "关闭本地频道...");
-            await clientChannel.CloseAsync();
+            //await clientChannel.CloseAsync();
+            await clientChannel2.CloseAsync();
             await group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1));
+            NLog(localAddress2, "关闭结束.");
         }
 
         [ContextMenu("StopClientChannel")]
