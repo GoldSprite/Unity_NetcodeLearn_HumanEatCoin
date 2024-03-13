@@ -90,6 +90,12 @@ java服务器端项目日志github地址: https://github.com/GoldSprite/TestNett
     - 增加TestNettyClient基本代码
     - [重点!]: PlayerSettings Player otherSettings 里面关闭assemblyVersionValidation才能运行外部包(也就是NuGet相关包), 不记得报错也会告诉你
 
+#### 24.3.13.0
+1. netty不行dotnetty bug太多, 换socket了
+2. 完成本地通信
+
+#### 24.3.13.1
+
 
 ---  
 ---  
