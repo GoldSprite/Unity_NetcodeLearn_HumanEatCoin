@@ -1,7 +1,10 @@
-﻿using DotNetty.Transport.Channels;
+﻿using DotNetty.Buffers;
+using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Text;
 using System.Threading;
 
 namespace GoldSprite.TestDotNetty_API {
@@ -16,9 +19,24 @@ namespace GoldSprite.TestDotNetty_API {
         }
 
 
-        public override void ChannelActive(IChannelHandlerContext context)
+        public override void ChannelActive(IChannelHandlerContext ctx)
         {
             LogTools.NLogInfo("频道已激活.");
+
+
+            IByteBuffer buf = ctx.Allocator.Buffer();
+            buf.WriteBytes(Encoding.UTF8.GetBytes("你好"));
+            DatagramPacket dpk = new DatagramPacket(buf, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8007));
+            LogTools.NLogDebug("已打包1.");
+
+            ctx.WriteAndFlushAsync(dpk).Wait();
+
+            buf = ctx.Allocator.Buffer();
+            buf.WriteBytes(Encoding.UTF8.GetBytes("你好"));
+            dpk = new DatagramPacket(buf, new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9007));
+            LogTools.NLogDebug("已打包2.");
+
+            ctx.WriteAndFlushAsync(dpk).Wait();
         }
 
 
@@ -34,6 +52,16 @@ namespace GoldSprite.TestDotNetty_API {
         }
 
 
+        public override void ChannelRead(IChannelHandlerContext ctx, object msg)
+        {
+            LogTools.NLogInfo("读数据: "+msg.ToString());
+        }
+
+        protected override void ChannelRead0(IChannelHandlerContext ctx, DatagramPacket msg)
+        {
+            LogTools.NLogInfo("读数据: " + msg.ToString());
+        }
+        /*
         protected override void ChannelRead0(IChannelHandlerContext ctx, DatagramPacket dpk)
         {
             var sender = dpk.Sender;
@@ -85,7 +113,7 @@ namespace GoldSprite.TestDotNetty_API {
             if (packet is ResponsePacket repPk)
                 Callback(repPk);
         }
-
+        */
 
         private void HandleMessageResponsePacket(MessageResponsePacket pk)
         {

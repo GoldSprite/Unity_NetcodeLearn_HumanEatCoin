@@ -56,9 +56,9 @@ namespace TestDotNetty_Client
         {
             var data = new ConnectData()
             {
-                localAddress = GlobalConfiguation.LocalAddress,
-                remoteAddress = GlobalConfiguation.LocalServerAddress
-                //remoteAddress = GlobalConfiguation.CloudServerAddress
+                localAddress = GlobalConfiguration.LocalAddress,
+                remoteAddress = GlobalConfiguration.LocalServerAddress
+                //remoteAddress = GlobalConfiguration.CloudServerAddress
             };
             networkManager.SetConnectData(data);
             LogTools.NLogDebug("StartClient...");

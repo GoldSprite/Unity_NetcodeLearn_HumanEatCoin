@@ -1,8 +1,11 @@
-﻿using DotNetty.Common.Concurrency;
+﻿using DotNetty.Buffers;
+using DotNetty.Common.Concurrency;
 using DotNetty.Transport.Channels;
+using DotNetty.Transport.Channels.Local;
 using DotNetty.Transport.Channels.Sockets;
 using System;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GoldSprite.TestDotNetty_API
@@ -29,7 +32,10 @@ namespace GoldSprite.TestDotNetty_API
             LogTools.NLogDebug("检测到待发送数据...");
             var packet = (Packet)msg;
             LogTools.NLogDebug("打包待发送数据...");
-            DatagramPacket dpk = EncodeAuthentication(packet, ctx);
+            //DatagramPacket dpk = EncodeAuthentication(packet, ctx);
+            IByteBuffer buf = ctx.Allocator.Buffer();
+            buf.WriteBytes(Encoding.UTF8.GetBytes("你好"));
+            DatagramPacket dpk = new DatagramPacket(buf, GlobalConfiguration.LocalServerAddress);
             if (dpk != null) {
                 LogTools.NLogDebug("已打包.");
                 return ctx.WriteAsync(dpk);

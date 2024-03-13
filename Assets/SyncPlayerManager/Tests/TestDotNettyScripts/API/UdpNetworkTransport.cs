@@ -24,9 +24,9 @@ namespace GoldSprite.TestDotNetty_API
         {
             this.channel = channel;
             var pipeline = channel.Pipeline;
-            pipeline.AddLast(new PacketDecodeHandler());
+            //pipeline.AddLast(new PacketDecodeHandler());
             pipeline.AddLast(packetHandler = new PacketHandler());
-            pipeline.AddLast(new PacketEncodeHandler());
+            //pipeline.AddLast(new PacketEncodeHandler());
         }
 
 

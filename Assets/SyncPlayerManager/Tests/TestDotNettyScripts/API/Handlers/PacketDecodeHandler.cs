@@ -22,8 +22,9 @@ namespace GoldSprite.TestDotNetty_API
 
 
         //这个步骤是为了Java-C#通信而准备的(JC互通无法自动识别DatagramPacket格式会被筛掉而收不到包)
-        public override void ChannelRead(IChannelHandlerContext ctx, object msg)
+        public override void ChannelRead(IChannelHandlerContext ctx, Object msg)
         {
+            LogTools.NLogDebug("接收到数据..."+msg.ToString());
             if (msg == null || !(msg is DatagramPacket)) throw new Exception("数据包格式异常.");
             DatagramPacket dpk = (DatagramPacket)msg;
             ctx.FireChannelRead(dpk);

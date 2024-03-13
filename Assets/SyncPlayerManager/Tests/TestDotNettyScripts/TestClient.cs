@@ -46,20 +46,21 @@ namespace TestDotNetty_Client {
 
         private void Run() {
             var data = new ConnectData() {
-                localAddress = GlobalConfiguation.LocalAddress,
-                //remoteAddress = GlobalConfiguation.LocalServerAddress
-                remoteAddress = GlobalConfiguation.CloudServerAddress
+                localAddress = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 9007)
+                ,
+                remoteAddress = GlobalConfiguration.LocalServerAddress
+                //remoteAddress = GlobalConfiguration.CloudServerAddress
             };
             networkManager.SetConnectData(data);
             networkManager.StartClient();
 
 
-            var msg = "Hello!";
-            LogTools.NLogMsg("发送消息: " + msg);
-            var pk = new MessageRequestPacket() { Message = msg };
-            networkManager.NetTrans.SendPacket<MessageResponsePacket>(pk, (rep) => {
-                LogTools.NLogMsg("已收到回信!: " + rep.ResonMsg);
-            });
+            //var msg = "Hello!";
+            //LogTools.NLogMsg("发送消息: " + msg);
+            //var pk = new MessageRequestPacket() { Message = msg };
+            //networkManager.NetTrans.SendPacket<MessageResponsePacket>(pk, (rep) => {
+            //    LogTools.NLogMsg("已收到回信!: " + rep.ResonMsg);
+            //});
         }
     }
 }

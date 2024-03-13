@@ -59,8 +59,8 @@ namespace TestDotNetty_Server
         {
             var data = new ConnectData()
             {
-                //localAddress = GlobalConfiguation.LocalServerAddress
-                localAddress = GlobalConfiguation.LocalAddress2
+                //localAddress = GlobalConfiguration.LocalServerAddress
+                localAddress = GlobalConfiguration.LocalAddress2
             };
             networkManager.SetConnectData(data);
             networkManager.StartServer();
