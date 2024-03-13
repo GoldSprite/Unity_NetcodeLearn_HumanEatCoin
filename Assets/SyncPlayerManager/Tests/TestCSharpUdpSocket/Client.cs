@@ -31,12 +31,19 @@ namespace Assets.SyncPlayerManager.Tests.TestCSharpUdpSocket {
             }
         }
 
+        private void Update()
+        {
+            if(Input.GetKeyDown(KeyCode.E)) {
+                sendMsg2();
+            }
+        }
+
 
         [ContextMenu("Start")]
         public void Main()
         {
             client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            client.Bind(new IPEndPoint(IPAddress.Parse("192.168.1.105"), 9007));
+            client.Bind(new IPEndPoint(IPAddress.Parse("192.168.1.105"), 34002));
             //t = new Thread(sendMsg);
             //t.Start();
             t2 = new Thread(ReciveMsg);
@@ -45,7 +52,7 @@ namespace Assets.SyncPlayerManager.Tests.TestCSharpUdpSocket {
         }
 
 
-        static EndPoint point = new IPEndPoint(IPAddress.Parse("192.168.1.105"), 8007);
+        static EndPoint point = new IPEndPoint(IPAddress.Parse("162.14.68.248"), 34001);
         [ContextMenu("SendMsg2")]
         public void sendMsg2()
         {

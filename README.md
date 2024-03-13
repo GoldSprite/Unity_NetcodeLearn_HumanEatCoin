@@ -94,8 +94,8 @@ java服务器端项目日志github地址: https://github.com/GoldSprite/TestNett
 1. netty不行dotnetty bug太多, 换socket了
 2. 完成本地通信
 
-#### 24.3.13.1
-
+#### 24.3.13.1-尝试云服定点通信
+1. 完成对向通信
 
 ---  
 ---  
